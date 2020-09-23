@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-const SECRET = 'mytokensecret';
+// const SECRET = 'mytokensecret';
 const userScema = new mongoose.Schema({
     username: {
         type: String,
@@ -13,8 +13,19 @@ const userScema = new mongoose.Schema({
     password: {
         type: String,
         require: true
+    },
+    role: {
+        type: String,
+        require: true
     }
 });
+
+const roles = {
+    Admin:['READ','CREATE','UPDATE','DELETE'],
+    Editor:['READ','CREATE'],
+    writer:['READ','CREATE','UPDATE'],
+    users:['READ']
+}
 // hooks
 // right before the save , has the password
 userScema.pre('save', async function () {
@@ -33,12 +44,22 @@ userScema.methods.comparePasswords = async function (password) {
 
 // add static methods
 // users.statics > add static methods on the schema
-userScema.statics.generateToken = function (username) {
+userScema.statics.generateToken = function (userObj) {
         // expires after half and hour (900 seconds = 15 minutes)
-    return jwt.sign({ username }, process.env.TOKEN_SECRET, {expiresIn: '10s'});
+        console.log('hhhhhhhhhhhhhhhhhh userObj',userObj);
+    return jwt.sign({
+        username: userObj.username,
+        role: roles[userObj.role]
+    }, process.env.TOKEN_SECRET, {expiresIn: '900s'});
+    // return jwt.sign({
+    //     username: userObj.username,
+    //     actions: roles[userObj.role]
+    // }, process.env.TOKEN_SECRET);
+    // return jwt.sign({ username }, process.env.TOKEN_SECRET);
 }
 
 userScema.statics.authenticateBasic = async function (username, password) {
+    console.log('inside authoraizeUser');
     let result = await this.findOne({username: username});
     if (result) {
         let compareResult = await result.comparePasswords(password);
@@ -51,7 +72,7 @@ userScema.statics.authoraizeUser = async function (token) {
     if (! token) {
         return Promise.reject();
     }
-    let jwtVarification = jwt.verify(token, SECRET, (err, decode) => {
+    let jwtVarification = jwt.verify(token, process.env.TOKEN_SECRET, (err, decode) => {
         if (err) {
             console.log('myError 1 : ', err);
             return false;
@@ -68,7 +89,8 @@ userScema.statics.authoraizeUser = async function (token) {
         console.log('> >>>>>>>> jwtVarification ', jwtVarification);
  if (jwtVarification) {
             let user = await this.findOne({username: jwtVarification.username})
-            return user ? Promise.resolve({user: user}).catch(error => {
+            console.log('>>>>>>>>>>>>>>',{user: user});
+            return user ? Promise.resolve({user: jwtVarification}).catch(error => {
                 console.log(error);
             }) : false;
         }
