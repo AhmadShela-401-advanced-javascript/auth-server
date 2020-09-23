@@ -3,8 +3,9 @@
 
 const users = require('./models/users-schema');
 
-const basicAuth = require('./middleware/basicAuth')
-const bearerMiddleware = require('./middleware/bearer-auth')
+const basicAuth = require('./middleware/basicAuth');
+const bearerMiddleware = require('./middleware/bearer-auth');
+const aclMiddleWare = require('./middleware/acl-middleware');
 const express = require('express');
 const router = express.Router();
 
@@ -13,6 +14,10 @@ router.post('/signin',basicAuth, signInHandler);
 router.get('/users',basicAuth, getAllUsers);
 router.get('/secret',bearerMiddleware,getSecretInfo);
 router.get('/secretPlus',bearerMiddleware,getSecretPlusInfo);
+router.get('/posts',bearerMiddleware,aclMiddleWare("READ"),getPosts);
+router.post('/posts',bearerMiddleware,aclMiddleWare("CREATE"),wirtePosts);
+router.put('/posts',bearerMiddleware,aclMiddleWare("UPDATE"),updatePosts);
+router.delete('/posts',bearerMiddleware,aclMiddleWare("DELETE"),deletePosts);
 
 /**
  * this function respons the token to the user if it is not exist
@@ -32,7 +37,8 @@ async function signUpHandler(req,res) {
     // hash the password first
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
     let registerdUser = await user.save()
-        let token = users.generateToken(registerdUser.username);
+        let token = users.generateToken(registerdUser);
+        // let token = users.generateToken(registerdUser.username);
         res.status(201).send(token);
 }
 
@@ -58,10 +64,22 @@ function getAllUsers(req,res){
     }
 }
 function getSecretInfo(req,res) {
-    res.status(200).send('Wellcome')
+    res.status(200).send(req.user)
 }
 
 function getSecretPlusInfo(req,res) {
-    res.status(200).send('Wellcome')
+    res.status(200).send('done')
+}
+function getPosts(req,res) {
+    res.status(200).send('done')
+}
+function wirtePosts(req,res) {
+    res.status(200).send('done')
+}
+function updatePosts(req,res) {
+    res.status(200).send('done')
+}
+function deletePosts(req,res) {
+    res.status(200).send('done')
 }
 module.exports = router

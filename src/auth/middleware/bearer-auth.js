@@ -10,6 +10,7 @@ if(!req.headers.authorization){
     let isUserAuthorize = await users.authoraizeUser(token)
 if(isUserAuthorize){
     // return isUserAuthorize;
+    req.user = isUserAuthorize.user
     next();
 }else{
     return next('Invalid Login, No Headers !!');
