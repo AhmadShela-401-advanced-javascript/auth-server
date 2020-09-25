@@ -6,6 +6,7 @@ const users = require('./models/users-schema');
 const basicAuth = require('./middleware/basicAuth');
 const bearerMiddleware = require('./middleware/bearer-auth');
 const aclMiddleWare = require('./middleware/acl-middleware');
+const oauhtoMidd = require('./middleware/oauthMiddleWare');
 const express = require('express');
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.get('/posts',bearerMiddleware,aclMiddleWare("READ"),getPosts);
 router.post('/posts',bearerMiddleware,aclMiddleWare("CREATE"),wirtePosts);
 router.put('/posts',bearerMiddleware,aclMiddleWare("UPDATE"),updatePosts);
 router.delete('/posts',bearerMiddleware,aclMiddleWare("DELETE"),deletePosts);
+router.get('/oauth',oauhtoMidd,getOauthInfo);
 
 /**
  * this function respons the token to the user if it is not exist
@@ -80,6 +82,9 @@ function updatePosts(req,res) {
     res.status(200).send('done')
 }
 function deletePosts(req,res) {
+    res.status(200).send('done')
+}
+function getOauthInfo(req,res) {
     res.status(200).send('done')
 }
 module.exports = router
