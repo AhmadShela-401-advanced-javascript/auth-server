@@ -15,10 +15,10 @@ router.post('/signin',basicAuth, signInHandler);
 router.get('/users',basicAuth, getAllUsers);
 router.get('/secret',bearerMiddleware,getSecretInfo);
 router.get('/secretPlus',bearerMiddleware,getSecretPlusInfo);
-router.get('/posts',bearerMiddleware,aclMiddleWare("READ"),getPosts);
-router.post('/posts',bearerMiddleware,aclMiddleWare("CREATE"),wirtePosts);
-router.put('/posts',bearerMiddleware,aclMiddleWare("UPDATE"),updatePosts);
-router.delete('/posts',bearerMiddleware,aclMiddleWare("DELETE"),deletePosts);
+router.get('/read',bearerMiddleware,aclMiddleWare("READ"),getPosts);
+router.post('/add',bearerMiddleware,aclMiddleWare("CREATE"),wirtePosts);
+router.put('/change',bearerMiddleware,aclMiddleWare("UPDATE"),updatePosts);
+router.delete('/delete',bearerMiddleware,aclMiddleWare("DELETE"),deletePosts);
 router.get('/oauth',oauhtoMidd,getOauthInfo);
 
 /**
